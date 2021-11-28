@@ -11,13 +11,13 @@
 
 clear; clc;
 
-%Loading of mat file containing the power density (W/cm^3):
+% Loading of mat file containing the power density (W/cm^3):
 load('tasa_calor_superficial.mat');
-%Definir potencia del laser: (actual = 2 W)
+% Definir potencia del laser: (actual = 4 W)
 global flujo
 flujo(4,:)=4*flujo(4,:);
-%% -------------------------------PDE Solution------------------------------
-% 1) Creation of the PDE's that we need to solve the problem:
+
+%% 1) Creation of the PDE that we need to solve the problem:
 %Main PDE
 thermalmodel = createpde(1);
 
@@ -43,22 +43,20 @@ mesh=generateMesh(thermalmodel,'Hmax',0.25,'Hmin', 0.05);
 %Laser on (L=1) or Laser off (L=0)
 global L
 L = 1;
-%Healthy tissue:
+% The coefficients were set through functions which assign them
+% according to the tissue type, defined by the coordinates of the points.
 specifyCoefficients(thermalmodel,'Cell',1,'m',0,'d',@d,"c",@k,"a",@a_c,"f",@f);
-%Damage tissue:
-%d_tumor_cte = 0.001*3500;
-%k_tumor_cte = 0.00642;
-%specifyCoefficients(thermalmodel,'Cell',2,'m',0,'d',d_tumor_cte,"c",k_tumor_cte,"a",@a_tumor,"f",@f_tumor);
 
-%% 6) Boundary conditions Laser:
+%% 6) Boundary conditions Laser: 
+% All faces but the front one (exposed to the laser) were set to be isothermal with a temperature
+% of 37 Celsius
 applyBoundaryCondition(thermalmodel,'dirichlet','Face',2,'u',37);
 applyBoundaryCondition(thermalmodel,'dirichlet','Face',4,'u',37);
 applyBoundaryCondition(thermalmodel,'dirichlet','Face',5,'u',37);
 applyBoundaryCondition(thermalmodel,'dirichlet','Face',6,'u',37);
 applyBoundaryCondition(thermalmodel,'dirichlet','Face',1,'u',37);
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',1,'h',@h,'r',@r);
 
-%Function to find the closest node to an specific coordinate:
+%Function to find the closest node to an specific coordinate: Necessary to plot
 getClosestNode = @(p,x,y,z) min((p(1,:) - x).^2 + (p(2,:) - y).^2 + (p(3,:) - z).^2);
 
 % iii) Initial conditions:
@@ -68,18 +66,19 @@ setInitialConditions(thermalmodel,R);
 
 
 %% 7) PDE solution:
-%thermalmodel.SolverOptions.MinStep = 0.5;
-%model.SolverOptions.AbsoluteTolerance = 1.0e-4;
+% The simulation is ran with a step of 5 seconds from 0 to 1000 seconds
 tlist = [0:5:1000];
 fprintf("solución");
 R = solvepde(thermalmodel,tlist);
 T = R.NodalSolution;
 
+%% 8) Plotting:
+% Plot of a 3D color map in a specific time:
 figure;
 pdeplot3D(thermalmodel,'ColorMapData',T(:,end)) %Índice 2 = 10 segundos
 title(['Temperature at Time 1000 s']);
 
-%% 8) Graficar aumento temporal temperatura en un punto (x,y,z) determinado:
+% Plot of temperature in different coordinate of the system:
 figure
 [~,nid2] = getClosestNode(mesh.Nodes, 0,0,-0.5);
 plot(tlist, T(nid2,:));
@@ -147,6 +146,7 @@ xlabel 'Time, seconds'
 ylabel 'Temperature, degrees-Celsius'
 hold off
 
+% 2D temperature plot (in a cut of the 3D figure)
 [x,y]=meshgrid(0:0.05:3, -3:0.05:3);
 [a,b]=size(x);
 T_XY = zeros(size(x));
@@ -170,7 +170,7 @@ cc = colorbar;
 c.Label.String = 'Temperatura [(°C)]';
 
 
-%% Tissue coefficients
+%% Tissue coefficients:
 %1. Constante "d": Cp*rho
 function d = d(location,~)
 d = zeros(size(location.x));    

@@ -1,4 +1,12 @@
-%% ---------------------------------------Fuzzy Logic Controller delta U----------------------------------------------------------
+%% Fuzzy logic controller configuration.
+% Author: Mauricio Cespedes Tenorio
+% Date: Nov. 28th, 2021
+% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Description: This code implements a Fuzzy Logic Controller with a Mandami Fuzzy Interference
+% System. 4 inputs, 1 output and 13 rules are used. If the controller is updated. The file
+% ".\MAT_files\fuzzy_controller_NPTT.mat" must be updated before executig 'PTT_controlled.m'.
+%
+
 clear;clc;
 % Creation of a Mamdami FIS with name "controller"
 fis = mamfis('Name',"controller");

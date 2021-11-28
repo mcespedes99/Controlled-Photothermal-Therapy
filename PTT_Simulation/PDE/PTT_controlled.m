@@ -1,108 +1,121 @@
-%% -------------------------------------- Algoritmo de control para PTT con difusor óptico-------------------------------------------
-%% Configuración de la simulación:
-%clear; clc;
-% Tiempo a simular:
+%% Simulation through PDE Toolbox to emulate temperature distribution on tissue under hyperthermia.
+% Author: Mauricio Cespedes Tenorio
+% Date: Nov. 28th, 2021
+% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Description: This code implements a simulation through the Partial Differential Equations 
+% Toolbox from MATLAB to emulate the temperature distribution in a tissue under laser
+% excitation (hyperthermia). To be able to run this code successfully, you must run the
+% Montecarlo simulation ('Montecarlo_algorithm.m'), have the controller configuration
+% saved under '.\MAT_files\fuzzy_controller_NPTT.mat' and execute the following files first:
+% 'Geometry_creation.m' and 'Montecarlo_to_PDE.m'. To plot the results after multiple executions
+% refer to the files 'Ploteo_multiple.m' and 'Plot_P_laser.m'. This code is based on the file
+% 'PDE_PTT.m'.
+%
+
+%% 1. Configuration of the simulation:
+clear; clc;
+% Simulation time: My recommendation is to execute the file by parts; i.e., not executing it
+% from 0s to 700s, but to execute first from 0 to 100s, then from 100s to 200s, and so on.
 t_total = 700; %5400s = 1.5 horas
 % Intervalos de tiempo a utilizar:
-%t_iterar = 10; %Cada 5 segundos
-%P_max = 4; %Potencia máxima del láser
+t_iterar = 10; %Cada 5 segundos
+P_max = 4; %Potencia máxima del láser
 
-%% Definition of parameters for thermal damage approximation
-%A_t = 1.98e106;
-%A_s = 1.18e44;
-%E_t = 6.67e5;
-%E_s = 3.02e5;
-%R_cte = 8.3145;
+%% 2. Definition of parameters for thermal damage approximation
+A_t = 1.98e106;
+A_s = 1.18e44;
+E_t = 6.67e5;
+E_s = 3.02e5;
+R_cte = 8.3145;
 
-%% Loading of Fuzzy Logic Controller:
-%load(".\MAT_files\fuzzy_controller_NPTT.mat");
+%% 3. Loading of Fuzzy Logic Controller:
+load(".\MAT_files\fuzzy_controller_NPTT.mat");
 
-%% Loading of mat file containing the power density (W/cm^3):
-%Loading of mat file containing the power density (W/cm^3):
-%load('.\MAT_files\Heat_rate_laser.mat');
+%% 4. Loading of mat file containing the power density (W/cm^3):
+load('.\MAT_files\Heat_rate_laser.mat');
 
 
-%% Initial conditions: 
+%% 5. Initial conditions: 
 % Laser power in Watts:
-%global flujo
-%flujo(4,:)=1*flujo(4,:);
+global flujo
+flujo(4,:)=1*flujo(4,:);
 % Laser state (ON=1, OFF=0):
 global L
-%L = 0;
+L = 0;
 %Inital time:
-%t=t_iterar;
+t=t_iterar;
 
-%% Creation of thermal model that is going to be use a the controlled system
-% 1) Creation of the PDE's that we need to solve the problem:
-%thermalmodel = createpde(1);
+%% 6. Creation of thermal model that is going to be use a the controlled system
+% a) Creation of the PDE that we need to solve the problem:
+thermalmodel = createpde(1);
 
-% 2) Creation of Geometry:
-%load(".\MAT_files\Geometry_NPTT.mat")
-%thermalmodel.Geometry = g;
+% b) Creation of Geometry:
+load(".\MAT_files\Geometry_NPTT.mat")
+thermalmodel.Geometry = g;
 
-% 3) Definition of the mesh:
-%mesh=generateMesh(thermalmodel,'Hmax',0.25,'Hmin', 0.05);
+% c) Definition of the mesh:
+mesh=generateMesh(thermalmodel,'Hmax',0.25,'Hmin', 0.05);
 %figure
 %pdemesh(mesh)
 
-% 4) Themal properties of tissue:
-%coef_tejido = specifyCoefficients(thermalmodel,'Cell',1,'m',0,'d',@d,"c",@k,"a",@a_c,"f",@f);
+% d) Themal properties of tissue:
+coef_tejido = specifyCoefficients(thermalmodel,'Cell',1,'m',0,'d',@d,"c",@k,"a",@a_c,"f",@f);
     
-% 5) Boundary conditions: All internal faces have constant temperature
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',2,'u',37);
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',4,'u',37);
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',5,'u',37);
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',6,'u',37);
-%applyBoundaryCondition(thermalmodel,'dirichlet','Face',1,'u',37);
+% e) Boundary conditions: All internal faces have constant temperature
+applyBoundaryCondition(thermalmodel,'dirichlet','Face',2,'u',37);
+applyBoundaryCondition(thermalmodel,'dirichlet','Face',4,'u',37);
+applyBoundaryCondition(thermalmodel,'dirichlet','Face',5,'u',37);
+applyBoundaryCondition(thermalmodel,'dirichlet','Face',6,'u',37);
+applyBoundaryCondition(thermalmodel,'dirichlet','Face',1,'u',37);
 
-%Function to find the closest node to an specific coordinate:
+% Function to find the closest node to an specific coordinate:
 getClosestNode = @(p,x,y,z) min((p(1,:) - x).^2 + (p(2,:) - y).^2 + (p(3,:) - z).^2);
 
-%% Variables that are used by the controller:
+%% 7. Variables that are used by the controller:
 % Thermal Damage at the coldest point inside the tumor:
-%TD = [0];
-%error_TD = [100];
-%T_TD = [37];
-%[~,nodo_TD] = getClosestNode(mesh.Nodes, 0.5,0,0);
+TD = [0];
+error_TD = [100];
+T_TD = [37];
+[~,nodo_TD] = getClosestNode(mesh.Nodes, 0.5,0,0);
 
 % Temperature at hottest point in Geometry:
-%Max_T = [37];
-%error_Max_T = [40];
-%[~,nodo_Max_T] = getClosestNode(mesh.Nodes, 0,0,0);
+Max_T = [37];
+%error_Max_T = [40]; % Not used right now
+[~,nodo_Max_T] = getClosestNode(mesh.Nodes, 0,0,0);
 
 %Prediction Max temperature:
-%error_Max_T_fut = [43];
+error_Max_T_fut = [43];
 
 % Max temperature rate:
-%Max_T_rate = [0];
+% Max_T_rate = [0]; % Not used right now
 
 % Temperature Healthy Tissue:
-%T_healthy = [37];
-%[~,nodo_T_H] = getClosestNode(mesh.Nodes, 0,0.7,0);
-%error_T_healthy = [11];
+T_healthy = [37];
+[~,nodo_T_H] = getClosestNode(mesh.Nodes, 0,0.7,0);
+%error_T_healthy = [11]; % Not used right now
 
 %Prediction Temperature Healthy Tissue:
-%error_T_healthy_fut = [9];
+error_T_healthy_fut = [9];
 
 % Thermal Damage Healthy Tissue:
-%TD_healthy = [0];
+TD_healthy = [0];
 
 
 % d(Thermal Damage Healthy Tissue)/dt:
-%dt_TD_healthy = [0];
+%dt_TD_healthy = [0]; % Not used right now
 
-%tiempo = [0];
-%potencia_L = [0];
+tiempo = [0];
+potencia_L = [0];
 %Para controlador Mamdami:
-%delta_u = 0;
+delta_u = 0;
 
 %% Simulación:
 while(t<=t_total)
     %Controller action:
     %Controlador v2
-    %L = evalfis(fis,[TD(end) Max_T(end) Max_T_rate(end) TD_healthy(end) dt_TD_healthy(end)]);
+    %L = evalfis(fis,[TD(end) Max_T(end) Max_T_rate(end) TD_healthy(end) dt_TD_healthy(end)]); % Not used right now
     %Controlador v3
-    %L = evalfis(fis,[TD(end) Max_T(end) Max_T_rate(end) T_healthy(end)]);
+    %L = evalfis(fis,[TD(end) Max_T(end) Max_T_rate(end) T_healthy(end)]); % Not used right now
     
     %Controlador Mamdami:
     delta_u = evalfis(fis,[error_TD(end) error_Max_T_fut(end) error_T_healthy_fut(end)]);
@@ -156,20 +169,20 @@ while(t<=t_total)
     % Temperature at hottest point in Geometry:
     actual_Max_T = T(nodo_Max_T,end);
     Max_T = cat(2, Max_T, actual_Max_T);
-    %error_Max_T = cat(2, error_Max_T, 75-Max_T(end));
+    %error_Max_T = cat(2, error_Max_T, 75-Max_T(end)); % Not used right now
     delta_Max_T = Max_T(end)-Max_T(end-1);
     Max_T_fut = Max_T(end)+delta_Max_T;
     % Actualizar error de T futuro:
     error_Max_T_fut = cat(2, error_Max_T_fut, 80-Max_T_fut);
     
-    % Max Temp rate:
+    % Max Temp rate: % Not used right now
     %dt_Max_T = (Max_T(end)-Max_T(end-1))/t_iterar;
     %Max_T_rate = cat(2, Max_T_rate, dt_Max_T);
     
     % Temperature Healthy Tissue:
     actual_T_H = T(nodo_T_H,end);
     T_healthy = cat(2, T_healthy, actual_T_H);
-    %error_T_healthy = cat(2, error_T_healthy, 46-T_healthy(end));
+    %error_T_healthy = cat(2, error_T_healthy, 46-T_healthy(end)); % Not used right now
     delta_T_h = T_healthy(end) - T_healthy(end-1);
     T_healthy_fut = T_healthy(end)+delta_T_h;
     error_T_healthy_fut  = cat(2, error_T_healthy_fut, 46-T_healthy_fut);
@@ -188,7 +201,7 @@ while(t<=t_total)
     TD_healthy = cat(2, TD_healthy, TDHT_actual);
     
     
-    % d(Thermal Damage Healthy Tissue)/dt:
+    % d(Thermal Damage Healthy Tissue)/dt: % Not used right now
     %dt_TDHT = (TD_healthy(end)-TD_healthy(end-1))/t_iterar;
     %t_TD_healthy = cat(2, dt_TD_healthy, dt_TDHT);
     
@@ -204,16 +217,16 @@ while(t<=t_total)
     disp(actual_Max_T);
     fprintf("\n Temperatura Max Error Fut:");
     disp(error_Max_T_fut(end));
-    %fprintf("\n Rate Temperatura Max:");
-    %disp(dt_Max_T);
+    %fprintf("\n Rate Temperatura Max:"); % Not used right now
+    %disp(dt_Max_T); % Not used right now
     fprintf("\n Temperatura TH:");
     disp(actual_T_H);
     fprintf("\n TD HT:");
     disp(TDHT_actual);
     fprintf("\n Error Fut Temp HT:");
     disp(error_T_healthy_fut(end));
-    %fprintf("\n d(TD)/dt HT:");
-    %disp(dt_TDHT);
+    %fprintf("\n d(TD)/dt HT:"); % Not used right now
+    %disp(dt_TDHT); % Not used right now
     
     % Update of time counter:
     tiempo = cat(2, tiempo, t);
