@@ -1,5 +1,14 @@
-% Ejemplo matlab esfera dentro de cubo: (0.5,0,0), (0,0,0), (0,0.7,0)
-%% ---------------------------Montecarlo results for light distribution inside the tissue-------------------------
+%% Heat distribution simulation through the PDE Toolbox.
+% Author: Mauricio Cespedes Tenorio
+% Date: Nov. 27th, 2021
+% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Description: The geometry used in the Montecarlo simulation is the same as the 
+% one used in the PDE simulation (heat distribution); however, the mesh is not the same 
+% since ValoMC uses tetrahedrons to create the mesh and MATLAB uses a rectangular mesh.
+% This code is intend to act as a coupler between both codes since the fluence by element
+% is required for PDE simulation.
+%
+
 clear; clc;
 
 %Loading of mat file containing the power density (W/cm^3):

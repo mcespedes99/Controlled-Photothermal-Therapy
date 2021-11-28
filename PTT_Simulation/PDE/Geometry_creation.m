@@ -1,4 +1,13 @@
-%% -------------------------------PDE Solution------------------------------
+%% Creation of geometry for PDE simulation (heat distribution)
+% Author: Mauricio Cespedes Tenorio
+% Date: Nov. 27th, 2021
+% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Description: This code is used to create the geometry used for the PDE simulation
+% to emulate heat distribution in the tissue. This code was based on the example 
+% 'Sphere in Cube' from the MATLAB PDE toolbox. For further reference, see
+% (https://www.mathworks.com/help/pdf_doc/pde/pde.pdf). For this case, only a cube with a 
+% mesh of 0.2 mm max in space was used. Therefore, no actual geometry was used. 
+%
 clear;clc;
 % 1) Creation of the PDE's that we need to solve the problem:
 %Main PDE

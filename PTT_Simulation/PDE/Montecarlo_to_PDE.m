@@ -1,4 +1,15 @@
-%% ---------------------------Acople con Montecarlo-------------------------
+%% Coupler between Montecarlo simulation and PDE simulation.
+% Author: Mauricio Cespedes Tenorio
+% Date: Nov. 27th, 2021
+% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Description: The geometry used in the Montecarlo simulation is the same as the 
+% one used in the PDE simulation (heat distribution); however, the mesh is not the same 
+% since ValoMC uses tetrahedrons to create the mesh and MATLAB uses a rectangular mesh.
+% This code is intend to calculate an approximate fluence for each point on the new grid 
+% (for the PDE simulation). It is important to notice that the mesh for the PDE simulation
+% must have smaller elements (more points) to avoid data loss. 
+%
+
 %Limpieza de consola y del workspace:
 clear; clc;
 
@@ -61,8 +72,7 @@ for i = 1:m
     end
 end
 
-%Esto es para plotearlo bonito. Si quiere entenderlo, me escribe y le
-%ayudo, si no logra sacar.
+%Esto es para plotearlo bonito; mas no tiene una utilidad verdadera. 
 [x,y]=meshgrid(0:0.025:3, -3:0.025:3);
 [a,b]=size(x);
 Q_XY = zeros(size(x));
