@@ -1,7 +1,7 @@
 """
 Author: Mauricio Cespedes Tenorio
 Date: Nov. 18th, 2021
-Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 Description: This code is used for the creation of the 3D geometry required for 
 Montecarlo simulation. The geometry consists on a brick composed by three layers
 of tissue with a spherical tumor inside of it. This code was based on the example code

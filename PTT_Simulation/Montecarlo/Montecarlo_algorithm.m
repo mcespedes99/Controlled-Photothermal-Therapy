@@ -1,7 +1,7 @@
 %% Montecarlo algorithm to simulate light propagation in tissue
 % Author: Mauricio Cespedes Tenorio
 % Date: Nov. 18th, 2021
-% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 % Description: This code is an implementation of Montecarlo algorithm in MATLAB.
 % To execute it, it is necessary to have the file 'tejido_piel.vol' within the same
 % directory, which can be generated through the code 'Geometry_generation.py'.

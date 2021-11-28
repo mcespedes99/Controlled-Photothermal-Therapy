@@ -1,7 +1,7 @@
 %% Plotting of the laser power:
 % Author: Mauricio Cespedes Tenorio
 % Date: Nov. 27th, 2021
-% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 % Description: I used this code to plot in a prettier way the laser power. Must
 % be executed before 'Ploteo_multiple.m'. Two important details are: 
 % 1. potencia_L_80: comes from the variable potencia_L from the file 'PTT_controlled.m'. I 

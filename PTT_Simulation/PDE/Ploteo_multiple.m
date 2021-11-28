@@ -1,7 +1,7 @@
 %% Plotting of variables after multiple executions of the file 'PTT_controlled.m'.
 % Author: Mauricio Cespedes Tenorio
 % Date: Nov. 28th, 2021
-% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 % Description: As described in the README file for this repository. I performed three simulations
 % with different values of T_max. Then, to plot each result, I renamed the variables extracted
 % from the execution of the file 'PTT_controlled.m' and plot them. Important: the file

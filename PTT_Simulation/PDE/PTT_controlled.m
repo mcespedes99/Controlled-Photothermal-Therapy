@@ -1,7 +1,7 @@
 %% Simulation through PDE Toolbox to emulate temperature distribution on tissue under hyperthermia.
 % Author: Mauricio Cespedes Tenorio
 % Date: Nov. 28th, 2021
-% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 % Description: This code implements a simulation through the Partial Differential Equations 
 % Toolbox from MATLAB to emulate the temperature distribution in a tissue under laser
 % excitation (hyperthermia). To be able to run this code successfully, you must run the

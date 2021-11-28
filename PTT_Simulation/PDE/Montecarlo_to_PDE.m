@@ -1,7 +1,7 @@
 %% Coupler between Montecarlo simulation and PDE simulation.
 % Author: Mauricio Cespedes Tenorio
 % Date: Nov. 27th, 2021
-% Copyright: Laboratorio de Investigacion en Ingieria Biomedica, UCR. 2021
+% Copyright: Laboratorio de Investigacion en Ingenieria Biomedica, UCR. 2021
 % Description: The geometry used in the Montecarlo simulation is the same as the 
 % one used in the PDE simulation (heat distribution); however, the mesh is not the same 
 % since ValoMC uses tetrahedrons to create the mesh and MATLAB uses a rectangular mesh.
